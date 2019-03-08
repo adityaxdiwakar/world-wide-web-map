@@ -49,32 +49,24 @@ def queue_pop(index):
     to_visit.pop(index)
     push_to_visit(to_visit)
 
-page = requests.get(ROOT_URL)
-webpage = html.fromstring(page.content)
-finds = webpage.xpath('//a/@href')
-finds = [x for x in finds if x.startswith("https")]
-for url in set(list(finds)):
-    append_to_visit(url)
-append_visited(ROOT_URL)
-
-print(get_to_visit())
-print(get_visited())
-
 while True:
-    t_url = get_to_visit()[0]
+    try:
+        t_url = get_to_visit()[0]
 
-    print(f"[{len(get_visited())}] Visiting {t_url} and found...", end=" ")
-    page = requests.get(t_url)
-    webpage = html.fromstring(page.content)
-    finds = webpage.xpath('//a/@href')
-    print(f"{len(finds)} URLs, total: {len(get_to_visit())}")
+        print(f"[{len(get_visited())}] Visiting {t_url} and found...", end=" ")
+        page = requests.get(t_url)
+        webpage = html.fromstring(page.content)
+        finds = webpage.xpath('//a/@href')
+        print(f"{len(finds)} URLs, total: {len(get_to_visit())}")
 
-    finds = [x for x in finds if x.startswith("https")]
+        finds = [x for x in finds if x.startswith("https")]
 
-    for url in set(list(finds)):
-        if check_for_queued_visit(url):
-            if check_for_visitation(url):
-                append_to_visit(url)
+        for url in set(list(finds)):
+            if check_for_queued_visit(url):
+                if check_for_visitation(url):
+                    append_to_visit(url)
 
-    append_visited(t_url)
+        append_visited(t_url)
+    except:
+        print("Something went wrong")
     queue_pop(0)
